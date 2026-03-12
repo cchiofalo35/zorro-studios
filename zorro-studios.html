@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zorro Studios — For the Game.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:      #0c0c0e;
+    --ink2:     #141416;
+    --ink3:     #1c1c1f;
+    --wire:     rgba(255,255,255,0.08);
+    --wire2:    rgba(255,255,255,0.05);
+    --cream:    #f0ece4;
+    --cream2:   rgba(240,236,228,0.75);
+    --cream3:   rgba(240,236,228,0.45);
+    --cream4:   rgba(240,236,228,0.22);
+    --fire:     #e8622a;
+    --fire-dim: rgba(232,98,42,0.18);
+    --fire-glow:rgba(232,98,42,0.06);
+    --gold:     #c8973a;
+    --gold-dim: rgba(200,151,58,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ═══ NAV ═══ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: rgba(12,12,14,0.88);
+    backdrop-filter: blur(24px) saturate(160%);
+    border-bottom: 1px solid var(--wire);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .logo-z { width: 32px; height: 32px; flex-shrink: 0; }
+  .logo-wordmark {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--cream3);
+    text-decoration: none;
+    padding: 0 18px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cream); }
+
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fire);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.7; }
+
+  /* ═══ HERO ═══ */
+  .hero {
+    padding-top: 56px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-left: 24px;
+    padding-right: 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+  }
+
+  /* Fire glow behind headline */
+  .hero-glow {
+    position: absolute;
+    width: 700px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    background: radial-gradient(ellipse at center, rgba(232,98,42,0.14) 0%, rgba(200,151,58,0.06) 40%, transparent 70%);
+    pointer-events: none;
+    filter: blur(40px);
+  }
+
+  /* Subtle grain */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* Thin horizontal line accent */
+  .hero-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--fire-dim) 30%, var(--fire-dim) 70%, transparent 100%);
+    pointer-events: none;
+    opacity: 0.4;
+    transform: translateY(-120px);
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fire);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.1s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-headline {
+    font-size: clamp(56px, 8.5vw, 112px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    color: var(--cream);
+    max-width: 900px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s ease both;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-headline em {
+    font-style: normal;
+    color: var(--fire);
+    position: relative;
+  }
+  .hero-headline .dim {
+    color: var(--cream3);
+    font-weight: 300;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 1.8vw, 20px);
+    font-weight: 300;
+    color: var(--cream3);
+    max-width: 480px;
+    line-height: 1.65;
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.32s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.44s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-fire {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--fire);
+    padding: 13px 28px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    letter-spacing: -0.01em;
+  }
+  .btn-fire:hover { background: #f0703a; transform: translateY(-1px); }
+
+  .btn-outline {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cream2);
+    background: transparent;
+    padding: 13px 28px;
+    border-radius: 4px;
+    border: 1px solid var(--wire);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    display: inline-block;
+    letter-spacing: -0.01em;
+  }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.2); color: var(--cream); transform: translateY(-1px); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    animation: fadeIn 1s 1s ease both;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, var(--fire), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ═══ DIVIDER ═══ */
+  hr.div { border: none; border-top: 1px solid var(--wire); margin: 0; }
+
+  /* ═══ STATS ═══ */
+  .stats {
+    background: var(--ink2);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .stat-item {
+    padding: 52px 32px;
+    border-right: 1px solid var(--wire);
+    text-align: center;
+    position: relative;
+  }
+  .stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 2px;
+    background: var(--fire);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .stat-item:hover::before { opacity: 1; }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .stat-num em { font-style: normal; color: var(--fire); }
+  .stat-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--cream3);
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  /* ═══ SECTIONS ═══ */
+  section { padding: 128px 32px; }
+  .section-inner { max-width: 1000px; margin: 0 auto; }
+  .section-inner.wide { max-width: 1240px; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fire);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--fire);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: clamp(38px, 4.5vw, 60px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+  .section-title .dim {
+    color: var(--cream3);
+    font-weight: 300;
+  }
+
+  /* ═══ ABOUT ═══ */
+  .about { background: var(--ink); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 64px;
+  }
+  .about-text p {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--cream2);
+    line-height: 1.8;
+    margin-bottom: 22px;
+  }
+  .about-text p strong { font-weight: 600; color: var(--cream); }
+
+  .about-card {
+    background: var(--ink2);
+    border: 1px solid var(--wire);
+    border-radius: 6px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--fire), var(--gold), transparent);
+  }
+  .about-card-quote {
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream2);
+    line-height: 1.65;
+    margin-bottom: 24px;
+  }
+  .about-card-attr {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cream4);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ═══ STRATEGY ═══ */
+  .strategy { background: var(--ink2); }
+  .strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 64px;
+    background: var(--wire);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .strategy-card {
+    background: var(--ink2);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s;
+  }
+  .strategy-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--fire), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .strategy-card:hover { background: var(--ink3); }
+  .strategy-card:hover::after { transform: scaleX(1); }
+
+  .card-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--fire);
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .card-text {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--cream3);
+    line-height: 1.7;
+  }
+
+  /* ═══ FLYWHEEL BAR ═══ */
+  .flywheel-bar {
+    background: var(--ink3);
+    border-top: 1px solid var(--wire);
+    border-bottom: 1px solid var(--wire);
+    padding: 22px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .fw-step {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--cream3);
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 0 20px;
+    transition: color 0.2s;
+  }
+  .fw-step:hover { color: var(--cream); }
+  .fw-arrow { color: var(--fire); font-size: 14px; flex-shrink: 0; opacity: 0.5; }
+
+  /* ═══ ECOSYSTEM ═══ */
+  .ecosystem { background: var(--ink); }
+  .eco-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 64px;
+  }
+  .eco-card {
+    background: var(--ink2);
+    border: 1px solid var(--wire);
+    border-radius: 6px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .eco-card:hover { border-color: rgba(232,98,42,0.2); }
+  .eco-card.tall { grid-row: span 2; display: flex; flex-direction: column; }
+  .eco-card-icon {
+    font-size: 22px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .eco-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+  .eco-card-body {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--cream3);
+    line-height: 1.7;
+    flex: 1;
+  }
+  .eco-streams { margin-top: 28px; }
+  .eco-stream-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--wire2);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--cream3);
+    transition: color 0.2s;
+  }
+  .eco-stream-item:hover { color: var(--cream2); }
+  .eco-stream-item:last-child { border-bottom: none; }
+  .eco-stream-item .arr { color: var(--fire); font-size: 11px; opacity: 0.6; }
+
+  /* ═══ TEAM ═══ */
+  .team { background: var(--ink2); }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 64px;
+  }
+  .team-card {
+    background: var(--ink);
+    border: 1px solid var(--wire);
+    border-radius: 6px;
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .team-card:hover { border-color: rgba(232,98,42,0.2); }
+  .team-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--fire), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .team-card:hover::before { opacity: 1; }
+  .team-initial {
+    width: 52px;
+    height: 52px;
+    background: var(--fire-dim);
+    border: 1px solid rgba(232,98,42,0.25);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--fire);
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .team-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 5px;
+  }
+  .team-role {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fire);
+    margin-bottom: 18px;
+    opacity: 0.8;
+  }
+  .team-bio {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--cream3);
+    line-height: 1.7;
+  }
+
+  /* ═══ CONTACT ═══ */
+  .contact { background: var(--ink); }
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 64px;
+  }
+  .contact-left p {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--cream2);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+  .contact-email {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--fire);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .contact-email:hover { opacity: 0.7; }
+
+  /* contact form styles removed since form no longer exists */
+
+  /* ═══ FOOTER ═══ */
+  footer {
+    background: var(--ink2);
+    border-top: 1px solid var(--wire);
+    padding: 40px 32px;
+  }
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-copy { font-size: 12px; font-weight: 300; color: var(--cream4); }
+  .footer-acn  { font-size: 12px; font-weight: 300; color: var(--cream4); }
+
+  /* ═══ ANIMATIONS ═══ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.8; transform: scaleY(1); }
+    50%       { opacity: 0.2; transform: scaleY(0.7); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 80px 20px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--wire); }
+    .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 40px; }
+    .strategy-grid, .team-grid { grid-template-columns: 1fr; }
+    .eco-grid { grid-template-columns: 1fr; }
+    .eco-card.tall { grid-row: auto; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .flywheel-bar { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo-mark">
+    <svg class="logo-z" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="6" fill="#0c0c0e"/>
+      <rect width="32" height="32" rx="6" fill="url(#lg)" opacity="0.15"/>
+      <polyline points="7,8 25,8 7,24 25,24" stroke="#f0ece4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <line x1="7" y1="24" x2="25" y2="8" stroke="#e8622a" stroke-width="1.4"/>
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="32" y2="32">
+          <stop offset="0%" stop-color="#e8622a"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="logo-wordmark">Zorro Studios</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#strategy">Strategy</a></li>
+    <li><a href="#ecosystem">Ecosystem</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in touch →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-line"></div>
+  <p class="hero-eyebrow">Melbourne, Australia · Est. 2024</p>
+  <h1 class="hero-headline">
+    For<br>
+    <em>the game.</em>
+  </h1>
+  <p class="hero-sub">
+    We build digital platforms for sport that the sport controls. Not licensing agreements. The platform becomes the lasting asset.
+  </p>
+  <div class="hero-actions">
+    <a href="#strategy" class="btn-fire">Our approach</a>
+    <a href="#contact" class="btn-outline">Work with us</a>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<hr class="div">
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item reveal">
+    <div class="stat-num">20<em>+</em></div>
+    <div class="stat-label">Titles shipped across<br>iOS, Android, console &amp; PC</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num">5<em>M+</em></div>
+    <div class="stat-label">Downloads across<br>prior franchises</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num"><em>#</em>1</div>
+    <div class="stat-label">Chart positions in<br>Australia &amp; Ireland</div>
+  </div>
+  <div class="stat-item reveal">
+    <div class="stat-num">AFL</div>
+    <div class="stat-label">Prior licensed titles<br>for Australia's national game</div>
+  </div>
+</div>
+
+<hr class="div">
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <p class="eyebrow reveal">Who we are</p>
+    <h2 class="section-title reveal">Built on <span class="dim">a decade<br>of doing it.</span></h2>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Zorro Studios is an Australian games studio formed by the founding team behind <strong>GoGallop Studios</strong> — creators of FEI Equestriad World Tour, a globally licensed equestrian mobile game that reached millions of downloads and came within weeks of an IPO on the Canadian Securities Exchange.</p>
+        <p>We have taken everything learned from that venture — the licensing model, the sponsorship integration, the fan engagement mechanics — and built a new vehicle designed to move faster and think bigger.</p>
+        <p>Our model is direct: partner with a sport that has an underserved digital audience, control the IP relationship, and build a platform — not a single title — that compounds in value over time.</p>
+      </div>
+      <div class="about-card reveal">
+        <p class="about-card-quote">"The strategic question is no longer whether a sport should participate in gaming — but whether it should control the platform that defines its fan economy."</p>
+        <p class="about-card-attr">Zorro Studios · Strategic Framework 2026</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- STRATEGY -->
+<section class="strategy" id="strategy">
+  <div class="section-inner wide">
+    <p class="eyebrow reveal">Our approach</p>
+    <h2 class="section-title reveal">The platform <span class="dim">playbook.</span></h2>
+    <div class="strategy-grid">
+      <div class="strategy-card reveal">
+        <div class="card-num">01</div>
+        <div class="card-title">License the sport</div>
+        <p class="card-text">Secure an official licensing relationship with the governing body or league. Real venues, real athletes, real competition structures. Authenticity is the only thing that converts fans into players.</p>
+      </div>
+      <div class="strategy-card reveal">
+        <div class="card-num">02</div>
+        <div class="card-title">Control the platform</div>
+        <p class="card-text">Rather than handing IP to a third-party publisher, we structure deals so the sport retains control. The platform becomes a compounding digital asset — not a one-off licensing fee.</p>
+      </div>
+      <div class="strategy-card reveal">
+        <div class="card-num">03</div>
+        <div class="card-title">Integrate sponsorship</div>
+        <p class="card-text">In-game sponsorship mirrors the real world — digital signage, branded kit, leaderboards, product placement. Partners reach a live audience. The game stays free to play.</p>
+      </div>
+      <div class="strategy-card reveal">
+        <div class="card-num">04</div>
+        <div class="card-title">Build the flywheel</div>
+        <p class="card-text">Fans become players. Players become competitors. Competitors become viewers. Viewers attract commercial partners. Each turn strengthens every other part of the ecosystem.</p>
+      </div>
+      <div class="strategy-card reveal">
+        <div class="card-num">05</div>
+        <div class="card-title">Expand the universe</div>
+        <p class="card-text">Mobile-first. Then PC and console. Then esports. The first title is proof of concept. The platform is designed to evolve — new modes, new seasons, new sports.</p>
+      </div>
+      <div class="strategy-card reveal">
+        <div class="card-num">06</div>
+        <div class="card-title">Partner with capital</div>
+        <p class="card-text">We structure partnerships with listed entities who bring governance, market access, and publishing scale — reducing execution risk while accelerating speed to market.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLYWHEEL BAR -->
+<div class="flywheel-bar">
+  <span class="fw-step">Fans</span>
+  <span class="fw-arrow">→</span>
+  <span class="fw-step">Players</span>
+  <span class="fw-arrow">→</span>
+  <span class="fw-step">Competitors</span>
+  <span class="fw-arrow">→</span>
+  <span class="fw-step">Viewers</span>
+  <span class="fw-arrow">→</span>
+  <span class="fw-step">Commercial Partners</span>
+</div>
+
+<!-- ECOSYSTEM -->
+<section class="ecosystem" id="ecosystem">
+  <div class="section-inner wide">
+    <p class="eyebrow reveal">The platform</p>
+    <h2 class="section-title reveal">Digital ecosystem <span class="dim">by design.</span></h2>
+    <div class="eco-grid">
+      <div class="eco-card tall reveal">
+        <span class="eco-card-icon">🏆</span>
+        <div class="eco-card-title">Official licensed title</div>
+        <p class="eco-card-body">An authentically licensed mobile game — free to play, with deep sport integration and real-world event structures baked in from day one. A foundation fans recognise and trust immediately.</p>
+        <div class="eco-streams">
+          <div class="eco-stream-item">In-app purchases — content &amp; cosmetics <span class="arr">›</span></div>
+          <div class="eco-stream-item">In-game sponsorship &amp; digital signage <span class="arr">›</span></div>
+          <div class="eco-stream-item">Branded merchandise integration <span class="arr">›</span></div>
+          <div class="eco-stream-item">Club &amp; athlete licensing IAPs <span class="arr">›</span></div>
+          <div class="eco-stream-item">Advertising &amp; social tie-ins <span class="arr">›</span></div>
+          <div class="eco-stream-item">Cross-brand promotional campaigns <span class="arr">›</span></div>
+          <div class="eco-stream-item">Platform licensing to partner sports <span class="arr">›</span></div>
+        </div>
+      </div>
+      <div class="eco-card reveal">
+        <span class="eco-card-icon">⚡</span>
+        <div class="eco-card-title">Esports layer</div>
+        <p class="eco-card-body">A structured competition ladder converting casual players into invested competitors — driving retention, media content, and community identity year-round.</p>
+      </div>
+      <div class="eco-card reveal">
+        <span class="eco-card-icon">📊</span>
+        <div class="eco-card-title">Data sovereignty</div>
+        <p class="eco-card-body">The sport retains direct control of fan data and engagement channels — a strategic asset that builds long-term independence from third-party publishers.</p>
+      </div>
+      <div class="eco-card reveal">
+        <span class="eco-card-icon">🌐</span>
+        <div class="eco-card-title">Multi-title scale</div>
+        <p class="eco-card-body">Shared infrastructure enables rapid expansion across titles, codes, and platforms — compounding technology and brand equity with every release.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="section-inner">
+    <p class="eyebrow reveal">Founders</p>
+    <h2 class="section-title reveal">The team behind <span class="dim">the record.</span></h2>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-initial">CL</div>
+        <div class="team-name">Craig Laughton</div>
+        <div class="team-role">Founder</div>
+        <p class="team-bio">Creator of the world's first horse-riding game. Producer of 20+ titles across Android, iOS, PlayStation, Xbox, Wii, and PC — multiple #1 chart positions in Australia and Ireland. Led prior AFL gaming titles. Founded GoGallop Studios, bringing the FEI equestrian franchise to over 5 million downloads and to the verge of a Canadian Securities Exchange IPO. Corporate lawyer and board-level executive.</p>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-initial">CC</div>
+        <div class="team-name">Chris Chiofalo</div>
+        <div class="team-role">CEO — GoGallop Studios</div>
+        <p class="team-bio">A 15-year veteran of investing and raising capital for startups. Chris sits across multiple boards advising and scaling companies through rapid growth phases. His experience bridging commercial strategy, capital markets, and early-stage gaming ventures makes him a central figure in Zorro Studios' path to market and institutional engagement.</p>
+      </div>
+      <div class="team-card reveal">
+        <div class="team-initial">ZS</div>
+        <div class="team-name">Zorro Studios</div>
+        <div class="team-role">ACN 678 650 925 · NSW</div>
+        <p class="team-bio">Registered in Australia under the Corporations Act 2001. A proprietary company limited by shares. Structured for public-market partnership and institutional investment, with active engagement across Melbourne, Sydney, and international markets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <p class="eyebrow reveal">Get in touch</p>
+    <h2 class="section-title reveal">Let's build something <span class="dim">that lasts.</span></h2>
+    <div class="contact-inner">
+      <div class="contact-left reveal">
+        <p>We're actively engaging with sporting bodies, publishing partners, and institutional investors. If you represent a league, a listed company, or a fund looking for exposure to the next generation of sports digital infrastructure — we want to hear from you.</p>
+        <a href="mailto:hello@zorrostudios.com.au" class="contact-email">hello@zorrostudios.com.au →</a>
+      </div>
+      <!-- contact form removed -->
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="logo-mark">
+      <svg class="logo-z" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="#0c0c0e"/>
+        <polyline points="7,8 25,8 7,24 25,24" stroke="#f0ece4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="7" y1="24" x2="25" y2="8" stroke="#e8622a" stroke-width="1.4"/>
+      </svg>
+      <span class="logo-wordmark">Zorro Studios</span>
+    </a>
+    <span class="footer-copy">Strictly Private &amp; Confidential — Not for Distribution</span>
+    <span class="footer-acn">ACN 678 650 925 · New South Wales, Australia</span>
+  </div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 55);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  reveals.forEach(el => obs.observe(el));
+
+  document.querySelector('.form-submit').addEventListener('click', function() {
+    this.textContent = 'Sent ✓';
+    this.style.background = '#2d8a4e';
+    this.style.color = '#f0ece4';
+    setTimeout(() => {
+      this.textContent = 'Send message';
+      this.style.background = '';
+      this.style.color = '';
+    }, 3000);
+  });
+</script>
+</body>
+</html>
